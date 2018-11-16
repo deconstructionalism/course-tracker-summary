@@ -204,5 +204,8 @@ bower.json # same
 # End of https://www.gitignore.io/api/rails
 .bak
 
+# Gooogle API credentials
+credentials.json
+
 # token from Google API
 token.json
