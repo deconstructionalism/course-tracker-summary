@@ -1,4 +1,4 @@
-const { CSVData } = require('./dataTypes/CSVData')
+const { CSVData } = require('../../lib/dataTypes/CSVData.js')
 
 class StudentFeedback {
   constructor (sheetCollection) {
@@ -42,7 +42,7 @@ class StudentFeedback {
     const { cellData } = sheet
 
     const csv = new CSVData(cellData, headerRow, rowRange, colRange)
-    csv.setHeaders = headerNames
+    csv.setHeaders(headerNames)
     this._csvs[title] = csv
   }
 
@@ -140,7 +140,7 @@ class StudentFeedback {
       row.forEach((col, index) => {
         if (index > 3) {
           const { columnName, values } = col
-          if (this._classRoom.studiesAndPractices.assigned.includes(columnName) && values[0] === '') {
+          if (this._classRoom.studiesAndPractices.assigned.includes(columnName) && values[0] === '0.0') {
             studiesAndPracticesData.missing.push(columnName)
           }
         }

@@ -1,36 +1,31 @@
-const path = require('path')
 const fs = require('fs')
-const { SheetsClient } = require('../lib/gapi/sheetsClient.js')
-const { scopes, oAuthCbConfig } = require('../bin/config.js')
-const { StudentFeedback } = require('../lib/studentFeedback.js')
+const { StudentFeedback } = require('./studentFeedback/index.js')
+const { createSheetsClient } = require('./sheetsApi/index.js')
 
-const summarize = (outfile) => {
+const courseTrackerId = '1FtwouNfcAWYmU6Efq6MBN0CqYYLtoF_sd8RlnCYdxtQ'
 
-  const prettyData = dataObj => JSON.stringify(dataObj, null, 4)
-
-  const handleSheetData = sheetCollection => {
-    const feedback = new StudentFeedback(sheetCollection)
-    const classRoom = feedback.classRoom
-    const roster = feedback.roster
-    const allData = prettyData({
-      classRoom,
-      roster
-    })
-    console.log(allData)
-    if (outfile) {
-      fs.writeFileSync(outfile, allData)
-    }
+const handleSheetData = (client, outfile) => {
+  const { sheetCollections } = client
+  const sheetCollection = sheetCollections['1FtwouNfcAWYmU6Efq6MBN0CqYYLtoF_sd8RlnCYdxtQ']
+  const feedback = new StudentFeedback(sheetCollection)
+  const classRoom = feedback.classRoom
+  const roster = feedback.roster
+  const allData = JSON.stringify({
+    classRoom,
+    roster
+  }, null, 4)
+  console.log(allData)
+  if (outfile) {
+    fs.writeFileSync(outfile, allData)
   }
+}
 
-  const spreadsheetId = '1FtwouNfcAWYmU6Efq6MBN0CqYYLtoF_sd8RlnCYdxtQ'
-
-  const sheets = new SheetsClient(scopes, oAuthCbConfig)
-
-  sheets.authorize(path.resolve('./credentials.json'))
-    .then(() => sheets.getSheetCollection({ spreadsheetId }))
-    .then(() => sheets.populateSheetCollectionData(spreadsheetId))
-    .then(handleSheetData)
-    .catch(console.err)
+const summarize = outfile => {
+  createSheetsClient()
+    .then(client => client.getSheetCollection({ spreadsheetId: courseTrackerId }))
+    .then(client => client.populateSheetCollectionData(courseTrackerId))
+    .then(client => handleSheetData(client, outfile))
+    .catch(console.error)
 }
 
 module.exports = summarize
