@@ -46,8 +46,8 @@ class StudentFeedback {
     const filterUnassigned = col => col.values.join('') === ''
     const filterAssigned = col => col.values.join('') !== ''
     const getNames = result => result.map(col => col.name)
-    const unassigned = csv.filter(1, filterUnassigned, colRange)
-    const assigned = csv.filter(1, filterAssigned, colRange)
+    const unassigned = csv.getColumns(...colRange).filter(filterUnassigned)
+    const assigned = csv.getColumns(...colRange).filter(filterAssigned)
     this.classRoom[assignmentType] = {
       assigned: getNames(assigned),
       unassigned: getNames(unassigned)
@@ -130,7 +130,7 @@ class StudentFeedback {
     }
     const csv = this._addCSV(title, headerRow, rowRange, columnRange, headerNames)
     this._roster = csv.getRows()
-    this._classRoom.students.enrolled = csv.filter(0, row => row.status === 'enrolled').length
+    this._classRoom.students.enrolled = csv.getRows().filter(row => row.status === 'enrolled').length
     this._classRoom.students.total = csv.shape[0]
   }
 
