@@ -6,19 +6,14 @@ class StudentFeedback {
     this._roster = []
     this._classRoom = {
       students: {},
-      diagnostics: {
-        assigned: [],
-        unassigned: []
-      },
-      studiesAndPractices: {
-        assigned: [],
-        unassigned: []
-      }
+      diagnostics: {},
+      studiesAndPractices: {}
     }
     this._csvs = {}
     this._constructRoster()
-    this._checkDiagnostics()
-    this._checkPracticesStudies()
+    this._constructDiagnostics()
+    this._constructPracticesStudies()
+    this._constructAttendance()
   }
 
   get roster () {
@@ -31,9 +26,79 @@ class StudentFeedback {
 
   getStudent (name) {
     name = name.toLowerCase()
-    return this._roster.filter(dev => {
+    const studentIndex = this._roster.findIndex(dev => {
       const fullName = `${dev.firstName} ${dev.lastName}`.toLowerCase()
       return fullName.includes(name)
+    })
+    const student = this._roster[studentIndex]
+    return [student, studentIndex]
+  }
+
+  _camelize (str) {
+    // https://stackoverflow.com/questions/2970525/converting-any-string-into-camel-case/2970667#2970667
+    return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+      return index === 0 ? letter.toLowerCase() : letter.toUpperCase()
+    }).replace(/\s+/g, '')
+  }
+
+  _populateAssignedUnassigned (csv, assignmentType, colRange) {
+    assignmentType = this._camelize(assignmentType)
+    const filterUnassigned = col => col.values.join('') === ''
+    const filterAssigned = col => col.values.join('') !== ''
+    const getNames = result => result.map(col => col.name)
+    const unassigned = csv.filter(1, filterUnassigned, colRange)
+    const assigned = csv.filter(1, filterAssigned, colRange)
+    this.classRoom[assignmentType] = {
+      assigned: getNames(assigned),
+      unassigned: getNames(unassigned)
+    }
+  }
+
+  _populateMissingAssignments (csv, assignmentType, missingFunc = val => val === '') {
+    assignmentType = this._camelize(assignmentType)
+    const { assigned } = this._classRoom[assignmentType]
+    csv.getRows().forEach(row => {
+      const missing = assigned.filter(name => missingFunc(row[name]))
+      const fullName = `${row.firstName} ${row.lastName}`
+      const [_, studentIndex] = this.getStudent(fullName)
+      const student = this._roster[studentIndex]
+      student[assignmentType] = { missing }
+    })
+  }
+
+  _populateAttendance (csv) {
+    const dateHeaders = csv.headers.slice(7)
+    csv.getRows().map(row => {
+      const attendance = dateHeaders.reduce((acc, header) => {
+        switch (row[header]) {
+          case 'L':
+            acc.late.push(header)
+            break
+          case 'A':
+            acc.absent.push(header)
+            break
+          case 'EA':
+            acc.excusedAbsent.push(header)
+            break
+          case 'EL':
+            acc.excusedLate.push(header)
+            break
+          case 'LC':
+            acc.lateOrLeftEarlyExcused.push(header)
+            break
+        }
+        return acc
+      }, {
+        late: [],
+        absent: [],
+        excusedAbsent: [],
+        excusedLate: [],
+        lateOrLeftEarlyExcused: []
+      })
+      const fullName = `${row.firstName} ${row.lastName}`
+      const [_, studentIndex] = this.getStudent(fullName)
+      const student = this._roster[studentIndex]
+      student.attendance = { ...attendance }
     })
   }
 
@@ -43,11 +108,17 @@ class StudentFeedback {
 
     const csv = new CSVData(cellData, headerRow, rowRange, colRange)
     csv.setHeaders(headerNames)
+    csv.dropEmpty()
+
     this._csvs[title] = csv
+    return this._csvs[title]
   }
 
   _constructRoster () {
     const title = 'Course Roster and Progress'
+    const headerRow = 6
+    const rowRange = [7]
+    const columnRange = [0, 7]
     const headerNames = {
       0: 'studentId',
       1: 'firstName',
@@ -57,97 +128,61 @@ class StudentFeedback {
       5: 'email',
       6: 'status'
     }
-    this._addCSV(title, 6, [7, 45], [0, 7], headerNames)
-    const csv = this._csvs[title]
-
-    for (let i = 0; i < csv.shape[0]; i++) {
-      const row = csv.indexRows(i)
-      const devData = {}
-      row.forEach(col => {
-        devData[col.columnName] = col.values[0]
-      })
-      this._roster.push(devData)
-    }
-    this._classRoom.students.enrolled = this._roster.filter(dev => dev.status === 'enrolled').length
-    this._classRoom.students.total = this._roster.length
+    const csv = this._addCSV(title, headerRow, rowRange, columnRange, headerNames)
+    this._roster = csv.getRows()
+    this._classRoom.students.enrolled = csv.filter(0, row => row.status === 'enrolled').length
+    this._classRoom.students.total = csv.shape[0]
   }
 
-  _checkDiagnostics () {
+  _constructDiagnostics () {
     const title = 'Diagnostics'
+    const headerRow = 2
+    const rowRange = [7]
+    const columnRange = [0]
     const headerNames = {
       0: 'firstName',
       1: 'lastName',
       2: 'github',
       3: 'mean'
     }
-    this._addCSV(title, 2, [7, 44], [0, 30], headerNames)
-    const csv = this._csvs[title]
-
-    for (let i = 4; i < csv.shape[1]; i++) {
-      const col = csv.indexColumns(i)
-      const joinedCol = col[0].values.join('')
-      if (joinedCol.length > 0) {
-        this._classRoom.diagnostics.assigned.push(col[0].columnName)
-      } else {
-        this._classRoom.diagnostics.unassigned.push(col[0].columnName)
-      }
-    }
-
-    for (let i = 0; i < csv.shape[0]; i++) {
-      const row = csv.indexRows(i)
-      const diagnosticsData = {
-        missing: []
-      }
-      row.forEach((col, index) => {
-        if (index > 3) {
-          const { columnName, values } = col
-          if (this._classRoom.diagnostics.assigned.includes(columnName) && values[0] === '') {
-            diagnosticsData.missing.push(columnName)
-          }
-        }
-      })
-      const dev = this._roster.find(dev => dev.firstName === row[0].values[0] && dev.lastName === row[1].values[0])
-      dev.diagnostics = diagnosticsData
-    }
+    const csv = this._addCSV(title, headerRow, rowRange, columnRange, headerNames)
+    this._populateAssignedUnassigned(csv, title, [4])
+    this._populateMissingAssignments(csv, title)
   }
 
-  _checkPracticesStudies () {
+  _constructPracticesStudies () {
     const title = 'Practice & Study'
+    const headerRow = 2
+    const rowRange = [7]
+    const columnRange = [0]
     const headerNames = {
       0: 'firstName',
       1: 'lastName',
       2: 'github',
       3: 'mean'
     }
-    this._addCSV(title, 2, [7, 44], [0, 38], headerNames)
-    const csv = this._csvs[title]
+    const csv = this._addCSV(title, headerRow, rowRange, columnRange, headerNames)
+    this._populateAssignedUnassigned(csv, title, [4])
+    this._populateMissingAssignments(csv, title, val => ['', '0.0'].includes(val))
+  }
 
-    for (let i = 4; i < csv.shape[1]; i++) {
-      const col = csv.indexColumns(i)
-      const joinedCol = col[0].values.join('')
-      if (joinedCol.length > 0) {
-        this._classRoom.studiesAndPractices.assigned.push(col[0].columnName)
-      } else {
-        this._classRoom.studiesAndPractices.unassigned.push(col[0].columnName)
-      }
+  _constructAttendance () {
+    const title = 'Attendance'
+    const headerRow = 8
+    const rowRange = [10, 46]
+    const columnRange = [1]
+    const headerNames = {
+      0: 'firstName',
+      1: 'lastName',
+      2: 'email',
+      3: 'absences',
+      4: 'excused',
+      5: 'late',
+      6: 'percentAttendance'
     }
-
-    for (let i = 0; i < csv.shape[0]; i++) {
-      const row = csv.indexRows(i)
-      const studiesAndPracticesData = {
-        missing: []
-      }
-      row.forEach((col, index) => {
-        if (index > 3) {
-          const { columnName, values } = col
-          if (this._classRoom.studiesAndPractices.assigned.includes(columnName) && values[0] === '0.0') {
-            studiesAndPracticesData.missing.push(columnName)
-          }
-        }
-      })
-      const dev = this._roster.find(dev => dev.firstName === row[0].values[0] && dev.lastName === row[1].values[0])
-      dev.studiesAndPractices = studiesAndPracticesData
-    }
+    const csv = this._addCSV(title, headerRow, rowRange, columnRange, headerNames)
+    csv.dropEmpty(1)
+    this._populateAttendance(csv)
   }
 }
 

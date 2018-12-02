@@ -4,9 +4,9 @@ const { createSheetsClient } = require('./sheetsApi/index.js')
 
 const courseTrackerId = '1FtwouNfcAWYmU6Efq6MBN0CqYYLtoF_sd8RlnCYdxtQ'
 
-const handleSheetData = (client, outfile) => {
+const handleSheetData = (client, outFile) => {
   const { sheetCollections } = client
-  const sheetCollection = sheetCollections['1FtwouNfcAWYmU6Efq6MBN0CqYYLtoF_sd8RlnCYdxtQ']
+  const sheetCollection = sheetCollections[courseTrackerId]
   const feedback = new StudentFeedback(sheetCollection)
   const classRoom = feedback.classRoom
   const roster = feedback.roster
@@ -15,17 +15,20 @@ const handleSheetData = (client, outfile) => {
     roster
   }, null, 4)
   console.log(allData)
-  if (outfile) {
-    fs.writeFileSync(outfile, allData)
+  if (outFile) {
+    fs.writeFileSync(outFile, allData)
   }
 }
 
-const summarize = outfile => {
-  createSheetsClient()
-    .then(client => client.getSheetCollection({ spreadsheetId: courseTrackerId }))
-    .then(client => client.populateSheetCollectionData(courseTrackerId))
-    .then(client => handleSheetData(client, outfile))
-    .catch(console.error)
+async function summarize (outFile) {
+  try {
+    const client = await createSheetsClient()
+    await client.getSheetCollection({ spreadsheetId: courseTrackerId })
+    await client.populateSheetCollectionData(courseTrackerId)
+    await handleSheetData(client, outFile)
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 module.exports = summarize
