@@ -1,13 +1,11 @@
-const { CSVData } = require('../../lib/dataTypes/CSVData.js')
+const { CSVData } = require('../lib/dataTypes/CSVData.js')
 
 class StudentFeedback {
   constructor (sheetCollection) {
     this._sheetCollection = sheetCollection
     this._roster = []
     this._classRoom = {
-      students: {},
-      diagnostics: {},
-      studiesAndPractices: {}
+      students: {}
     }
     this._csvs = {}
     this._constructRoster()
