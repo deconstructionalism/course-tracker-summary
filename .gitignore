@@ -209,3 +209,6 @@ credentials.json
 
 # token from Google API
 token.json
+
+# data files
+/data/*
