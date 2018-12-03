@@ -5,13 +5,16 @@
   "private": true,
   "dependencies": {
     "googleapis": "^27.0.0",
-    "opn": "^5.4.0"
+    "js-base64": "^2.4.9",
+    "nodemailer": "^4.7.0",
+    "opn": "^5.4.0",
+    "showdown": "^1.9.0"
   },
   "scripts": {
-    "getToken": "node './scripts/getToken.js'",
-    "constructClassData": "node './scripts/constructClassData.js'",
-    "generateEmailTemplate": "node './scripts/generateEmailTemplate.js'",
-    "sendEmails": "node './scripts/sendEmails.js'"
+    "getToken": "node './scripts/getToken'",
+    "constructClassData": "node './scripts/constructClassData'",
+    "generateEmailTemplate": "node './scripts/generateEmailTemplate'",
+    "sendEmails": "node './scripts/sendEmails'"
   },
   "devDependencies": {
     "chai": "^4.1.2",
