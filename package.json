@@ -11,6 +11,7 @@
     "showdown": "^1.9.0"
   },
   "scripts": {
+    "preinstall": "node './scripts/makeDataFolders'",
     "getToken": "node './scripts/getToken'",
     "constructClassData": "node './scripts/constructClassData'",
     "generateEmailTemplate": "node './scripts/generateEmailTemplate'",
