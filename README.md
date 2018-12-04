@@ -7,11 +7,16 @@ information.
 
 ## Installation
 
-1. clone this repository locally
-2. run `npm install`
-3. follow the directions for **Step 1** only [here](https://developers.google.com/sheets/api/quickstart/nodejs#step_1_turn_on_the)
-4. move the `credentials.json` file created in the previous step to the root of
-   your cloned repo
+1. Clone this repository locally.
+2. Run `npm install`.
+3. Follow the directions for **Step 1** only [here](https://developers.google.com/sheets/api/quickstart/nodejs#step_1_turn_on_the)
+   to create a project and activate the Sheets API, then download credentials.
+   Note the name of the project you create.
+4. Follow the directions for **Step 1** only [here](https://developers.google.com/gmail/api/quickstart/nodejs#step_1_turn_on_the)
+   to activate the Sheets API for your project. Select the same project that you
+   noted above. You do not need to download the configuration file again.
+5. Move the `credentials.json` file created in the previous step to the root of
+   your cloned repo.
 
 ## Usage
 
