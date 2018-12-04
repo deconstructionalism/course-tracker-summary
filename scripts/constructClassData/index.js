@@ -1,6 +1,6 @@
 const { SheetsClient } = require('../../lib/gapi/sheetsClient.js')
 const { scopes, oAuthCbConfig } = require('../config.js')
-const { StudentFeedback } = require('../../bin/studentFeedback.js')
+const { CourseTracker } = require('../../bin/courseTrackerSummary.js')
 const { writeFileSync } = require('fs')
 const { checkFilesExist } = require('../tools.js')
 
@@ -25,8 +25,8 @@ async function constructClassData () {
 
 const constructStudentData = (client) => {
   const { sheetCollections } = client
-  const courseTracker = sheetCollections[courseTrackerId]
-  const feedback = new StudentFeedback(courseTracker)
+  const courseTrackerSheet = sheetCollections[courseTrackerId]
+  const feedback = new CourseTracker(courseTrackerSheet)
   const { classRoom, roster } = feedback
   const allData = JSON.stringify({ classRoom, roster }, null, 4)
   writeFileSync(classDataOutFilePath, allData)

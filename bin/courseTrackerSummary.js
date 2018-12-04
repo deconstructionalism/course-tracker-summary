@@ -1,6 +1,6 @@
 const { CSVData } = require('../lib/dataTypes/CSVData.js')
 
-class StudentFeedback {
+class CourseTracker {
   constructor (sheetCollection) {
     this._sheetCollection = sheetCollection
     this._roster = []
@@ -185,5 +185,5 @@ class StudentFeedback {
 }
 
 module.exports = {
-  StudentFeedback
+  CourseTracker
 }

@@ -64,7 +64,7 @@ information.
 ## Customize Student Data
 
 You can customize which data is parsed from the course tracker by modifying the
-logic within `bin/studentFeedback.js`. _More on this soon..._
+logic within `bin/CourseTracker.js`. _More on this soon..._
 
 ## Comments and Tests
 
