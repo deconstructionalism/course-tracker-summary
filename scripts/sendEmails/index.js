@@ -2,7 +2,7 @@ const { GmailClient } = require('../../lib/gapi/gmailClient.js')
 const { scopes, oAuthCbConfig } = require('../config.js')
 const { readFileSync, writeFileSync } = require('fs')
 const { resolve } = require('path')
-const { checkFilesExist } = require('../tools.js')
+const { checkFilesExist, getDateForFileName } = require('../tools.js')
 
 const classDataFilePath = './data/classData.json'
 const credentialsFilePath = './credentials.json'
@@ -31,7 +31,7 @@ const writeMailLogs = mailQueue => {
     events: mail.events
   }))
   const logData = JSON.stringify(logs, null, 4)
-  const mailLogOutFilePath = `./data/mailLogs/${new Date()}.json`
+  const mailLogOutFilePath = `./data/mailLogs/${getDateForFileName()}.json`
   writeFileSync(mailLogOutFilePath, logData)
 }
 
@@ -41,18 +41,20 @@ const constructAndSend = function (client, emailTemplateFilePath) {
 
   const { classRoom, roster } = classData
 
-  Promise.all(roster.map((student, index) => {
-    if (student.status !== 'enrolled') return null
-
-    const mailConfig = {
-      to: 'deconstructionalism@gmail.com',
-      cc,
-      subject: subject.call({ classRoom, student }),
-      text: text.call({ classRoom, student })
-    }
-    return client.queueMail(mailConfig, true)
+  Promise.all(roster.map(student => {
+    return student.status !== 'enrolled'
+      ? null
+      : client.queueMail({
+        to: 'deconstructionalism@gmail.com',
+        // to: student.email,
+        cc,
+        subject: subject.call({ classRoom, student }),
+        text: text.call({ classRoom, student })
+      }, true)
   }))
     .then(client.sendAllMail)
+    // .then(() => sleep(5000))
+    // .then(() => client.checkMailNotBounced())
     .then(() => writeMailLogs(client.mailQueue))
 }
 

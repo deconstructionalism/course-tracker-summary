@@ -59,7 +59,29 @@ const generateObjectDescription = (obj, replaceKeys, showFirstOfArray) => {
   return JSON.stringify(obj, replacer, 4)
 }
 
+const getDateForFileName = () => {
+  return new Date().toLocaleString('en-USA', {
+    hour12: false,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'})
+    .replace(/\//gi, '-')
+    .replace(', ', '_')
+    .replace(/:/gi, '-')
+}
+
+const sleep = (ms) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(), ms)
+  })
+}
+
 module.exports = {
   checkFilesExist,
-  generateObjectDescription
+  generateObjectDescription,
+  getDateForFileName,
+  sleep
 }
