@@ -26,10 +26,15 @@ const writeTemplate = (dataDescription, templateName) => {
 ${dataDescription}
 */
 
-const cc = ['cc_person@host.com', 'cc_person_two@host.com']
+const cc = [
+  'cc_person@host.com',
+  'cc_person_two@host.com'
+]
+
 const subject = function () {
   return \`Email Subject\`
 }
+
 const text = function () {
   return \`
 Hello Person,
