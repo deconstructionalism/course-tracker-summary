@@ -1,6 +1,7 @@
 {
   "name": "ga-wdi-boston.node-template",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "googleapis": "^27.0.0",
