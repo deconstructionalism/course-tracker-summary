@@ -1,4 +1,5 @@
 const { CSVData } = require('../lib/dataTypes/CSVData.js')
+const { camelize } = require('./tools.js')
 
 class CourseTracker {
   constructor (sheetCollection) {
@@ -32,15 +33,8 @@ class CourseTracker {
     return [student, studentIndex]
   }
 
-  _camelize (str) {
-    // https://stackoverflow.com/questions/2970525/converting-any-string-into-camel-case/2970667#2970667
-    return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
-      return index === 0 ? letter.toLowerCase() : letter.toUpperCase()
-    }).replace(/\s+/g, '')
-  }
-
   _populateAssignedUnassigned (csv, assignmentType, colRange) {
-    assignmentType = this._camelize(assignmentType)
+    assignmentType = camelize(assignmentType)
     const filterUnassigned = col => col.values.join('') === ''
     const filterAssigned = col => col.values.join('') !== ''
     const getNames = result => result.map(col => col.name)
@@ -53,7 +47,7 @@ class CourseTracker {
   }
 
   _populateMissingAssignments (csv, assignmentType, missingFunc = val => val === '') {
-    assignmentType = this._camelize(assignmentType)
+    assignmentType = camelize(assignmentType)
     const { assigned } = this._classRoom[assignmentType]
     csv.getRows().forEach(row => {
       const missing = assigned.filter(name => missingFunc(row[name]))
