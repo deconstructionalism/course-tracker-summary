@@ -45,16 +45,13 @@ const constructAndSend = function (client, emailTemplateFilePath) {
     return student.status !== 'enrolled'
       ? null
       : client.queueMail({
-        to: 'deconstructionalism@gmail.com',
-        // to: student.email,
+        to: student.email,
         cc,
         subject: subject.call({ classRoom, student }),
         text: text.call({ classRoom, student })
       }, true)
   }))
     .then(client.sendAllMail)
-    // .then(() => sleep(5000))
-    // .then(() => client.checkMailNotBounced())
     .then(() => writeMailLogs(client.mailQueue))
 }
 
