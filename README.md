@@ -35,6 +35,15 @@ information.
 1. Run `npm run constructClassData`. Class data will be saved in
    `./data/classData.json`.
 
+### Construct Project Data
+
+> Requires: token, class data
+
+1. Run 
+   `npm run constructClassData <path to project-eval-server projects folder>`.
+   Class data in `./data/classData.json` will be updated with per-student
+   completion information for each project.
+
 ### Generate an Email Template
 
 > Requires: token, class data
