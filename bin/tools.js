@@ -14,16 +14,24 @@ const getInnerDirs = (outerDirPath, ignore = ignoreDirs) => {
   return dirs.filter(dir => ignore.some(regex => !dir.match(regex)))
 }
 
+const filterFilesByExtension = (dirPath, extensions) => {
+  const files = readdirSync(dirPath)
+  return files.filter(file => extensions.some(regex => file.match(regex)))
+}
+
 const camelize = str => {
   // https://stackoverflow.com/questions/2970525/converting-any-string-into-camel-case/2970667#2970667
-  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
-    return index === 0
-      ? letter.toLowerCase()
-      : letter.toUpperCase()
-  }).replace(/\s+/g, '')
+  return str.replace('-', ' ')
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+      return index === 0
+        ? letter.toLowerCase()
+        : letter.toUpperCase()
+    })
+    .replace(/\s+/g, '')
 }
 
 module.exports = {
   getInnerDirs,
-  camelize
+  camelize,
+  filterFilesByExtension
 }
