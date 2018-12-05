@@ -26,8 +26,8 @@ async function constructClassData () {
 const constructStudentData = (client) => {
   const { sheetCollections } = client
   const courseTrackerSheet = sheetCollections[courseTrackerId]
-  const feedback = new CourseTracker(courseTrackerSheet)
-  const { classRoom, roster } = feedback
+  const courseTrackerData = new CourseTracker(courseTrackerSheet)
+  const { classRoom, roster } = courseTrackerData
   const allData = JSON.stringify({ classRoom, roster }, null, 4)
   writeFileSync(classDataOutFilePath, allData)
 }
