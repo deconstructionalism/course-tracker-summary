@@ -24,9 +24,8 @@ information.
 
 1. Run `npm run getToken`
 2. In the window that pops up, select your account and allow access, then close
-   the window once you are done. Your token is saved as `./token.json`. You will
-   not need to re-authenticate using the browser again unless your token is
-   invalidated.
+   the window once you are done. Your token is saved as `./token.json`. Your
+   token will remain valid for ~1 hour.
 
 ### Construct Class Data
 
@@ -70,10 +69,10 @@ information.
 2. A log of all email contents and send statuses will be saved in
   `./data/maulLogs`.
 
-## Customize Student Data
+## Customize Data Processing
 
-You can customize which data is parsed from the course tracker by modifying the
-logic within `bin/CourseTracker.js`. _More on this soon..._
+You can customize which data is processed by modifying the logic within the
+classes in `./bin/`. _More on this soon..._
 
 ## Comments and Tests
 
