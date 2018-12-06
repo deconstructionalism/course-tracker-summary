@@ -74,7 +74,7 @@ class ProjectCompletion {
             req.fulfilled ? (reqCatAcc.fulfilled++ && reqAcc.fulfilled++) : reqCatAcc.dnm.push(req.spec)
             return reqCatAcc
           }, { count: 0, fulfilled: 0, dnm: [] })
-          reqAcc.category[reqCat] = {
+          reqAcc.category[camelize(reqCat)] = {
             percentageComplete: catSummary.fulfilled / catSummary.count,
             dnm: catSummary.dnm
           }
@@ -85,8 +85,8 @@ class ProjectCompletion {
         delete projectSummary.count
         delete projectSummary.fulfilled
 
-        summary[projectName] = projectSummary
-        projectNames.push(projectName)
+        summary[camelize(projectName)] = projectSummary
+        projectNames.push(camelize(projectName))
       }
       this._classData.roster[studentIndex].projects = summary
       this._classData.classRoom.projects = { graded: projectNames }

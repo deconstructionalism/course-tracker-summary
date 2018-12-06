@@ -12,7 +12,16 @@ const oAuthCbConfig = {
   }
 }
 
+const classDataFilePath = './data/classData.json'
+const credentialsFilePath = './credentials.json'
+const tokenFilePath = './token.json'
+
 module.exports = {
   scopes,
-  oAuthCbConfig
+  oAuthCbConfig,
+  paths: {
+    credentialsFilePath,
+    tokenFilePath,
+    classDataFilePath
+  }
 }

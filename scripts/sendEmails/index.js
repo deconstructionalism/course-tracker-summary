@@ -2,11 +2,13 @@ const { GmailClient } = require('../../lib/gapi/gmailClient.js')
 const { scopes, oAuthCbConfig } = require('../config.js')
 const { readFileSync, writeFileSync } = require('fs')
 const { resolve } = require('path')
-const { checkFilesExist, getDateForFileName } = require('../tools.js')
+const { checkFilesExist, getDateForFileName, paths } = require('../tools.js')
 
-const classDataFilePath = './data/classData.json'
-const credentialsFilePath = './credentials.json'
-const tokenFilePath = './token.json'
+const {
+  classDataFilePath,
+  credentialsFilePath,
+  tokenFilePath
+} = paths
 
 async function sendEmails () {
   process.assert(process.argv.length === 3, 'must pass single template name argument (the name of a template in the "./data/emailTemplates" folder without the ".js" extension)!')
