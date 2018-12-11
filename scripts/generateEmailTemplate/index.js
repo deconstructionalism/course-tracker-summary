@@ -26,6 +26,10 @@ const writeTemplate = (dataDescription, templateName) => {
 ${dataDescription}
 */
 
+const options = {
+  filterStudents: student => student.status === 'enrolled'
+}
+
 const cc = [
   'cc_person@host.com',
   'cc_person_two@host.com'
@@ -78,7 +82,8 @@ _deconstructionalism@gmail.com_
 module.exports = {
   cc,
   subject,
-  text
+  text,
+  options
 }
 `
   const templateOutFilePath = `./data/emailTemplates/${templateName}.js`
