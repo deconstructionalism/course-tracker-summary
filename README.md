@@ -64,10 +64,20 @@ information.
 
 > Requires: token, class data, email template
 
+To build emails without sending:
+
 1. Run `npm run sendEmails <template name>`. The template name must match a
    a template name in `./data/emailTemplates/` (without the `.js` extension).
 2. A log of all email contents and send statuses will be saved in
-  `./data/maulLogs`.
+  `./data/mailLogs`, and email previews will be printed to the standard out and
+  can be captured to a file using
+  `npm run sendEmails <template name> > <file name>`.
+
+To send the emails:
+
+1. Same as above, except run `npm run sendEmails <template name> sendReal`.
+2. A log of all email contents and send statuses will be saved in
+  `./data/mailLogs`.
 
 ## Customize Data Processing
 
